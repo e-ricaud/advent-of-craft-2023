@@ -6,6 +6,7 @@ import people.PetType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
@@ -53,25 +54,28 @@ class PopulationTests {
                         "Glenn Quagmire");
     }
 
-    private static StringBuilder formatPopulation() {
-        final var response = new StringBuilder();
+    // for (...) sur une liste -> il esiste forEach pour les List + lisible
+    // on extrait la methode format person
+    // utilisation du stream + map pour obtenir le resultat en string
+    // Une methode -> Un concept
+    private static String formatPopulation() {
+        return population.stream()
+                .map(PopulationTests::formatPerson)
+                .collect(Collectors.joining(lineSeparator()));
+    }
 
-        for (var person : population) {
-            response.append(format("%s %s", person.firstName(), person.lastName()));
+    private static String formatPerson(Person person) {
+        return format("%s %s", person.firstName(), person.lastName()) +
+                (!person.pets().isEmpty() ? formatPets(person) : "");
+    }
 
-            if (!person.pets().isEmpty()) {
-                response.append(" who owns : ");
-            }
-
-            for (var pet : person.pets()) {
-                response.append(pet.name()).append(" ");
-            }
-
-            if (!population.getLast().equals(person)) {
-                response.append(lineSeparator());
-            }
-        }
-        return response;
+    private static String formatPets(Person person) {
+        return person.pets()
+                .stream()
+                .map(pet -> pet.name())
+                .collect(
+                        Collectors.joining(" ", " who owns : ", " ")
+                );
     }
 
     @Test
