@@ -1,98 +1,53 @@
 package games;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FizzBuzzTests {
-    @Test
-    void returns_the_given_number_for_1() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(1))
-                .isEqualTo("1");
+
+    // Add Test Parameterize pour eviter la duplication de tests similaire
+    public static Stream<Arguments> fizzBuzzTestParams() {
+        return Stream.of(
+                Arguments.of(1, "1"),
+                Arguments.of(67, "67"),
+                Arguments.of(82, "82"),
+                Arguments.of(3, "Fizz"),
+                Arguments.of(66, "Fizz"),
+                Arguments.of(99, "Fizz"),
+                Arguments.of(5, "Buzz"),
+                Arguments.of(50, "Buzz"),
+                Arguments.of(85, "Buzz"),
+                Arguments.of(15, "FizzBuzz"),
+                Arguments.of(30, "FizzBuzz"),
+                Arguments.of(45, "FizzBuzz")
+        );
     }
 
-    @Test
-    void returns_the_given_number_for_67() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(67))
-                .isEqualTo("67");
+    @ParameterizedTest
+    @MethodSource("fizzBuzzTestParams")
+    void returns_the_given_number(int givenNumber, String expectedResult) throws OutOfRangeException {
+        assertThat(FizzBuzz.convert(givenNumber))
+                .isEqualTo(expectedResult);
     }
 
-    @Test
-    void returns_the_given_number_for_82() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(82))
-                .isEqualTo("82");
+    public static Stream<Arguments> invalidInputParams() {
+        return Stream.of(
+                Arguments.of(0),
+                Arguments.of(101),
+                Arguments.of(-1)
+        );
     }
 
-    @Test
-    void returns_Fizz_for_3() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(3))
-                .isEqualTo("Fizz");
-    }
-
-    @Test
-    void returns_Fizz_for_66() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(66))
-                .isEqualTo("Fizz");
-    }
-
-    @Test
-    void returns_Fizz_for_99() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(99))
-                .isEqualTo("Fizz");
-    }
-
-    @Test
-    void returns_Buzz_for_5() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(5))
-                .isEqualTo("Buzz");
-    }
-
-    @Test
-    void returns_Buzz_for_50() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(50))
-                .isEqualTo("Buzz");
-    }
-
-    @Test
-    void returns_Buzz_for_85() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(85))
-                .isEqualTo("Buzz");
-    }
-
-    @Test
-    void returns_FizzBuzz_for_15() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(15))
-                .isEqualTo("FizzBuzz");
-    }
-
-    @Test
-    void returns_FizzBuzz_for_30() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(30))
-                .isEqualTo("FizzBuzz");
-    }
-
-    @Test
-    void returns_FizzBuzz_for_45() throws OutOfRangeException {
-        assertThat(FizzBuzz.convert(45))
-                .isEqualTo("FizzBuzz");
-    }
-
-    @Test
-    void throws_an_exception_for_0() {
-        assertThatThrownBy(() -> FizzBuzz.convert(0))
-                .isInstanceOf(OutOfRangeException.class);
-    }
-
-    @Test
-    void throws_an_exception_for_101() {
-        assertThatThrownBy(() -> FizzBuzz.convert(101))
-                .isInstanceOf(OutOfRangeException.class);
-    }
-
-    @Test
-    void throws_an_exception_for_minus_1() {
-        assertThatThrownBy(() -> FizzBuzz.convert(-1))
+    @ParameterizedTest
+    @MethodSource("invalidInputParams")
+    void throw_exception_when_input_invalid(int givenNumber) throws OutOfRangeException {
+        assertThatThrownBy(() -> FizzBuzz.convert(givenNumber))
                 .isInstanceOf(OutOfRangeException.class);
     }
 }
