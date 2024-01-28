@@ -4,57 +4,57 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static blog.ArticleBuilder.anArticle;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ArticleTests {
-    public static final String AUTHOR = "Pablo Escobar";
-    private static final String COMMENT_TEXT = "Amazing article !!!";
-    private Article article;
+    private ArticleBuilder articleBuilder;
 
     @BeforeEach
     void setup() {
-        article = new Article(
-                "Lorem Ipsum",
-                "consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-        );
+        articleBuilder = anArticle();
     }
 
     @Test
     void should_add_comment_in_an_article() throws CommentAlreadyExistException {
-        article.addComment(COMMENT_TEXT, AUTHOR);
+        final var article = articleBuilder.build();
+        article.addComment(ArticleBuilder.COMMENT_TEXT, ArticleBuilder.AUTHOR);
 
         assertThat(article.getComments()).hasSize(1);
-
-        var comment = article.getComments().get(0);
-        assertThat(comment.text()).isEqualTo(COMMENT_TEXT);
-        assertThat(comment.author()).isEqualTo(AUTHOR);
+        assertComment(article.getComments().get(0), ArticleBuilder.COMMENT_TEXT, ArticleBuilder.AUTHOR);
     }
 
     @Test
     void should_add_comment_in_an_article_containing_already_a_comment() throws CommentAlreadyExistException {
-        var newComment = "Finibus Bonorum et Malorum";
-        var newAuthor = "Al Capone";
+        final var newComment = "Finibus Bonorum et Malorum";
+        final var newAuthor = "Al Capone";
 
-        article.addComment(COMMENT_TEXT, AUTHOR);
+        var article = articleBuilder
+                .commented()
+                .build();
+
         article.addComment(newComment, newAuthor);
 
         assertThat(article.getComments()).hasSize(2);
-
-        var lastComment = article.getComments().getLast();
-        assertThat(lastComment.text()).isEqualTo(newComment);
-        assertThat(lastComment.author()).isEqualTo(newAuthor);
+        assertComment(article.getComments().getLast(), newComment, newAuthor);
     }
 
     @Nested
     class Fail {
         @Test
-        void when_adding_an_existing_comment() throws CommentAlreadyExistException {
-            article.addComment(COMMENT_TEXT, AUTHOR);
+        void when__adding_an_existing_comment() throws CommentAlreadyExistException {
+            final var article = articleBuilder.build();
+            article.addComment(ArticleBuilder.COMMENT_TEXT, ArticleBuilder.AUTHOR);
 
             assertThatThrownBy(() -> {
-                article.addComment(COMMENT_TEXT, AUTHOR);
+                article.addComment(ArticleBuilder.COMMENT_TEXT, ArticleBuilder.AUTHOR);
             }).isInstanceOf(CommentAlreadyExistException.class);
         }
+    }
+
+    private static void assertComment(Comment comment, String commentText, String author) {
+        assertThat(comment.text()).isEqualTo(commentText);
+        assertThat(comment.author()).isEqualTo(author);
     }
 }
