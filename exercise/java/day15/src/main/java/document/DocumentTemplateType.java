@@ -1,6 +1,10 @@
 package document;
 
-import static document.RecordType.ALL;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public enum DocumentTemplateType {
     DEERPP("DEER", RecordType.INDIVIDUAL_PROSPECT),
@@ -19,17 +23,23 @@ public enum DocumentTemplateType {
         this.recordType = recordType;
     }
 
+    private static Map<String, DocumentTemplateType> mergedMapping = Stream.concat(
+                    List.of(DocumentTemplateType.values()).stream().collect(Collectors
+                            .toMap(v -> formatKey(v.getDocumentType(), v.getRecordType().name()), v -> v)).entrySet().stream(),
+                    List.of(RecordType.values()).stream()
+                            .collect(Collectors.toMap(v -> formatKey(SPEC.name(), v.name()), v -> SPEC)).entrySet().stream()
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
+
+
+    private static String formatKey(String documentType, String recordType) {
+        return documentType.toUpperCase() + "-" + recordType.toUpperCase();
+    }
+
     public static DocumentTemplateType fromDocumentTypeAndRecordType(String documentType, String recordType) {
-        for (DocumentTemplateType dtt : DocumentTemplateType.values()) {
-            if (dtt.getDocumentType().equalsIgnoreCase(documentType)
-                    && dtt.getRecordType().equals(RecordType.valueOf(recordType))) {
-                return dtt;
-            } else if (dtt.getDocumentType().equalsIgnoreCase(documentType)
-                    && dtt.getRecordType().equals(ALL)) {
-                return dtt;
-            }
-        }
-        throw new IllegalArgumentException("Invalid Document template type or record type");
+        return Optional.ofNullable(
+                mergedMapping.get(formatKey(documentType, recordType))
+        ).orElseThrow(() -> new IllegalArgumentException("Invalid Document template type or record type"));
     }
 
     private RecordType getRecordType() {

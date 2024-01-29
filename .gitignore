@@ -48,3 +48,6 @@ build/
 bin/
 Obj/
 *.user
+
+### Approval exclusion ###
+*.received.*
