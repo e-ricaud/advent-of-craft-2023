@@ -12,4 +12,18 @@
 
     <artifactId>lap</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <archunit-junit5.version>1.2.0</archunit-junit5.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>${archunit-junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 </project>
