@@ -15,6 +15,16 @@ class ArticleTests {
     private Article article;
 
     @Test
+    void should_add_comment_in_an_article_immutable() throws CommentAlreadyExistException {
+        Article newArticle = anArticle()
+                .build()
+                .addComment(COMMENT_TEXT, AUTHOR);
+
+        assertThat(newArticle.getComments()).hasSize(1);
+        assertComment(newArticle.getComments().get(0), COMMENT_TEXT, AUTHOR);
+    }
+
+    @Test
     void should_add_comment_in_an_article() throws CommentAlreadyExistException {
         when(article -> article.addComment(COMMENT_TEXT, AUTHOR));
         then(article -> {
