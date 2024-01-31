@@ -1,3 +1,4 @@
+import domain.yahtzee.Roll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,11 +20,36 @@ class YahtzeeCalculatorTests {
         );
     }
 
+//    @MethodSource("numbers")
+//    @ParameterizedTest
+//    void sum_for_numbers_for(DiceBuilder dice, int number, int expectedResult) {
+//        number(
+//                dice.build(),
+//                number,
+//                score -> assertThat(score).isEqualTo(expectedResult),
+//                error -> fail()
+//        );
+//    }
+
+    //    @MethodSource("numbers")
+//    @ParameterizedTest
+//    void sum_for_numbers_for(DiceBuilder dice, int number, int expectedResult) {
+//        assertThat(number(dice.build(), number))
+//                .isEqualTo(expectedResult);
+//    }
     @MethodSource("numbers")
     @ParameterizedTest
     void sum_for_numbers_for(DiceBuilder dice, int number, int expectedResult) {
-        assertThat(number(dice.build(), number))
-                .isEqualTo(expectedResult);
+        assertThat(
+                Roll.from(dice.build()).map(r -> number(r, number))
+        ).hasRightValueSatisfying(score -> assertThat(score).isEqualTo(expectedResult));
+
+//        assertThat(
+//                 Create a roll from primitive types
+//                Roll.from(dice.build())
+//                         call the behavior on the domain if parsing ok
+//                        .map(r -> number(r, number))
+//        ).hasRightValueSatisfying(score -> assertThat(score).isEqualTo(expectedResult));
     }
 
     public static Stream<Arguments> threeOfAKinds() {

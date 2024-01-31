@@ -5,7 +5,15 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Traversable;
 
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+
 import static io.vavr.collection.List.ofAll;
+
+// Hollywood principle :
+// Don't Call Us, We'll Call You
+// One of the most popular way to implement this principle is to use events or callbacks
+// The basic idea behind it is let the caller decide what happens next
 
 public class YahtzeeCalculator {
     private static final int ROLL_LENGTH = 5;
@@ -39,6 +47,43 @@ public class YahtzeeCalculator {
                         .sum()
                         .intValue()
                 , dice);
+    }
+
+    public static void number(int[] dice,
+                              int number,
+                              IntConsumer onSuccess,
+                              Consumer<String> onError) {
+        calculateWithoutException(
+                d -> d.filter(die -> die == number)
+                        .sum()
+                        .intValue(), dice, onSuccess, onError);
+    }
+
+    public static int number(Roll roll, int number) {
+        return calculate(d -> d.filter(die -> die == number)
+                        .sum()
+                        .intValue()
+                , roll.dice());
+    }
+
+    private static void calculateWithoutException(Function1<Seq<Integer>, Integer> compute,
+                                                  int[] dice,
+                                                  IntConsumer onSuccess,
+                                                  Consumer<String> onError) {
+        validateRollWithoutException(dice, onError);
+        onSuccess.accept(
+                compute.apply(ofAll(dice))
+        );
+    }
+
+    private static void validateRollWithoutException(int[] dice, Consumer<String> onError) {
+        if (hasInvalidLength(dice)) {
+            onError.accept("Invalid dice... A roll should contain 6 dice.");
+        }
+
+        if (containsInvalidDie(dice)) {
+            onError.accept("Invalid die value. Each die must be between 1 and 6.");
+        }
     }
 
     public static int threeOfAKind(int[] dice) {
